@@ -3,15 +3,13 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Home, FileText } from "lucide-react"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Generador de Chance Astrológico",
+  title: "Prueba tu Suerte",
   description: "Genera números de chance personalizados basados en tu fecha de nacimiento y signo zodiacal",
-    generator: 'v0.dev'
+  generator: "v0.dev",
 }
 
 export default function RootLayout({
@@ -27,21 +25,7 @@ export default function RootLayout({
             <div className="flex justify-between h-16">
               <div className="flex items-center">
                 <Link href="/" className="text-xl font-bold text-gray-900">
-                  🌟 Chance Astrológico
-                </Link>
-              </div>
-              <div className="flex items-center space-x-4">
-                <Link href="/">
-                  <Button variant="ghost" size="sm">
-                    <Home className="w-4 h-4 mr-2" />
-                    Inicio
-                  </Button>
-                </Link>
-                <Link href="/documentation">
-                  <Button variant="ghost" size="sm">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Documentación
-                  </Button>
+                  🌟 Prueba tu Suerte
                 </Link>
               </div>
             </div>

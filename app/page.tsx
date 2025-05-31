@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Calendar, Star, Sun, Moon, Dice1 } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Calendar, Star, Sun, Dice1 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,16 +10,9 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 
 interface ChanceResult {
-  astroSol: {
-    numbers: string
-    zodiacSign: string
-    luckyNumbers: number[]
-  }
-  astroLuna: {
-    numbers: string
-    zodiacSign: string
-    luckyNumbers: number[]
-  }
+  chanceNumber: string
+  zodiacSign: string
+  horoscope: string
   birthInfo: {
     date: string
     zodiacSign: string
@@ -32,6 +25,36 @@ export default function ChanceGenerator() {
   const [result, setResult] = useState<ChanceResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [animatingNumbers, setAnimatingNumbers] = useState<string[]>([])
+  const [showAnimation, setShowAnimation] = useState(false)
+  const [animationStep, setAnimationStep] = useState(0)
+
+  // Función para generar números aleatorios para la animación
+  const generateAnimationNumbers = () => {
+    return Array.from({ length: 4 }, () => Math.floor(Math.random() * 10).toString())
+  }
+
+  // Efecto para la animación de números
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+
+    if (showAnimation) {
+      interval = setInterval(() => {
+        setAnimatingNumbers(generateAnimationNumbers())
+        setAnimationStep((prev) => prev + 1)
+      }, 100) // Cambiar números cada 100ms
+
+      // Detener la animación después de 3 segundos
+      setTimeout(() => {
+        setShowAnimation(false)
+        setAnimationStep(0)
+      }, 3000)
+    }
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [showAnimation])
 
   const handleGenerate = async () => {
     if (!birthDate) {
@@ -41,26 +64,33 @@ export default function ChanceGenerator() {
 
     setLoading(true)
     setError("")
+    setResult(null)
+    setShowAnimation(true)
+    setAnimatingNumbers(generateAnimationNumbers())
 
     try {
-      const response = await fetch("/api/generate-chance", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ birthDate }),
-      })
+      // Esperar a que termine la animación antes de mostrar el resultado
+      setTimeout(async () => {
+        const response = await fetch("/api/generate-chance", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ birthDate }),
+        })
 
-      if (!response.ok) {
-        throw new Error("Error al generar los números")
-      }
+        if (!response.ok) {
+          throw new Error("Error al generar los números")
+        }
 
-      const data = await response.json()
-      setResult(data)
+        const data = await response.json()
+        setResult(data)
+        setLoading(false)
+      }, 3200) // Esperar un poco más que la animación
     } catch (err) {
       setError("Error al generar los números. Intenta nuevamente.")
-    } finally {
       setLoading(false)
+      setShowAnimation(false)
     }
   }
 
@@ -71,12 +101,11 @@ export default function ChanceGenerator() {
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-gray-900 flex items-center justify-center gap-2">
             <Star className="text-yellow-500" />
-            Generador de Chance Astrológico
+            Prueba tu Suerte
             <Star className="text-yellow-500" />
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Genera tus números de la suerte para Astro Sol y Astro Luna basados en tu fecha de nacimiento y signo
-            zodiacal
+            Genera tu número de la suerte basado en tu fecha de nacimiento y signo zodiacal
           </p>
         </div>
 
@@ -87,7 +116,7 @@ export default function ChanceGenerator() {
               <Calendar className="w-5 h-5" />
               Fecha de Nacimiento
             </CardTitle>
-            <CardDescription>Ingresa tu fecha de nacimiento para generar tus números personalizados</CardDescription>
+            <CardDescription>Ingresa tu fecha de nacimiento para generar tu número personalizado</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -110,71 +139,103 @@ export default function ChanceGenerator() {
               ) : (
                 <>
                   <Star className="w-4 h-4 mr-2" />
-                  Generar Números
+                  Generar Número
                 </>
               )}
             </Button>
           </CardContent>
         </Card>
 
+        {/* Animation */}
+        {showAnimation && (
+          <Card className="border-yellow-200 bg-gradient-to-br from-yellow-50 to-orange-50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-yellow-700 text-center justify-center">
+                <Dice1 className="w-6 h-6 animate-spin" />
+                Seleccionando tu Número de la Suerte...
+              </CardTitle>
+              <CardDescription className="text-center">Los números están siendo elegidos para ti</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center">
+                <div className="text-6xl font-bold text-yellow-600 mb-4 font-mono tracking-wider">
+                  {animatingNumbers.join("")}
+                </div>
+                <div className="flex justify-center space-x-2">
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full animate-bounce"></div>
+                  <div
+                    className="w-3 h-3 bg-yellow-500 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  ></div>
+                  <div
+                    className="w-3 h-3 bg-yellow-500 rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  ></div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Results */}
-        {result && (
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Astro Sol */}
-            <Card className="border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50">
+        {result && !showAnimation && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Main Number */}
+            <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-700">
-                  <Sun className="w-6 h-6" />
-                  Astro Sol
+                <CardTitle className="flex items-center gap-2 text-purple-700 text-center justify-center">
+                  <Star className="w-6 h-6" />
+                  Tu Número de la Suerte
                 </CardTitle>
-                <CardDescription>Números generados para el sorteo solar</CardDescription>
+                <CardDescription className="text-center">Número generado para tu signo zodiacal</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-orange-600 mb-2">{result.astroSol.numbers}</div>
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                    {result.astroSol.zodiacSign}
+                  <div className="text-6xl font-bold text-purple-600 mb-4 animate-pulse-once">
+                    {result.chanceNumber}
+                  </div>
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-700 text-lg px-4 py-2">
+                    {result.zodiacSign}
                   </Badge>
                 </div>
                 <Separator />
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Números de la suerte:</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {result.astroSol.luckyNumbers.map((num, index) => (
-                      <Badge key={index} variant="outline" className="border-orange-300">
-                        {num}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
-            {/* Astro Luna */}
-            <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50">
+            {/* Horoscope */}
+            <Card className="animate-slide-up">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-700">
-                  <Moon className="w-6 h-6" />
-                  Astro Luna
+                <CardTitle className="flex items-center gap-2">
+                  <Sun className="w-5 h-5" />
+                  Horóscopo de Hoy
                 </CardTitle>
-                <CardDescription>Números generados para el sorteo lunar</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">{result.astroLuna.numbers}</div>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                    {result.astroLuna.zodiacSign}
-                  </Badge>
-                </div>
-                <Separator />
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-2">Números de la suerte:</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {result.astroLuna.luckyNumbers.map((num, index) => (
-                      <Badge key={index} variant="outline" className="border-blue-300">
-                        {num}
-                      </Badge>
-                    ))}
+              <CardContent>
+                <p className="text-gray-700 leading-relaxed">{result.horoscope}</p>
+              </CardContent>
+            </Card>
+
+            {/* Birth Info */}
+            <Card className="animate-slide-up" style={{ animationDelay: "0.2s" }}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="w-5 h-5" />
+                  Información Astrológica
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-sm text-gray-600">Fecha de Nacimiento</p>
+                    <p className="font-semibold">{result.birthInfo.date}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Signo Zodiacal</p>
+                    <p className="font-semibold">{result.birthInfo.zodiacSign}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Día del Año</p>
+                    <p className="font-semibold">{result.birthInfo.dayOfYear}</p>
                   </div>
                 </div>
               </CardContent>
@@ -182,40 +243,60 @@ export default function ChanceGenerator() {
           </div>
         )}
 
-        {/* Birth Info */}
-        {result && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="w-5 h-5" />
-                Información Astrológica
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-4 text-center">
-                <div>
-                  <p className="text-sm text-gray-600">Fecha de Nacimiento</p>
-                  <p className="font-semibold">{result.birthInfo.date}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Signo Zodiacal</p>
-                  <p className="font-semibold">{result.birthInfo.zodiacSign}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Día del Año</p>
-                  <p className="font-semibold">{result.birthInfo.dayOfYear}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Footer */}
         <div className="text-center text-sm text-gray-500 space-y-2">
-          <p>Los números son generados usando algoritmos basados en tu información astrológica</p>
+          <p>Los números son generados usando algoritmos especiales y tu información astrológica</p>
           <p className="text-xs">Recuerda jugar responsablemente</p>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes pulse-once {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out;
+        }
+
+        .animate-slide-up {
+          animation: slide-up 0.6s ease-out;
+        }
+
+        .animate-pulse-once {
+          animation: pulse-once 1s ease-in-out;
+        }
+      `}</style>
     </div>
   )
 }
