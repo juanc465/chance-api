@@ -36,6 +36,7 @@ Cada número generado viene con una interpretación detallada que proporciona in
    npm run dev
    o
    yarn dev
+   
 4.**Acceder a la aplicación**
    ve a http://localhost:3000
 
