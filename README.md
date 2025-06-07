@@ -27,12 +27,14 @@ Cada número generado viene con una interpretación detallada que proporciona in
    git clone https://github.com/tu-usuario/generador-numeros-astrologicos.git
    cd generador-numeros-astrologicos
 2. **Instalar dependencias**
+
    npm install
-   # o
+   o 
    yarn install
-3. **Ejecutar en modo desarrollo**
+4. **Ejecutar en modo desarrollo**
+
    npm run dev
-   # o
+   o
    yarn dev
 4.**Acceder a la aplicación**
    ve a http://localhost:3000
