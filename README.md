@@ -1,30 +1,52 @@
-# Astrology number generator
+# Generador de Números Astrológicos
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+## Resumen de la Aplicación
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/juanlosada01-8558s-projects/v0-astrology-number-generator)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/VmWcKEMhPwj)
+El **Generador de Números Astrológicos** es una aplicación web que permite a los usuarios calcular sus números personales basados en la numerología y astrología. La aplicación toma la **fecha de nacimiento** y/o el **nombre completo** del usuario para generar diferentes números astrológicos como:
 
-## Overview
+- **Número de Camino de Vida**: Basado en la fecha de nacimiento
+- **Número de Destino**: Calculado a partir del nombre completo
+- **Número de Alma**: Derivado de las vocales en el nombre
+- **Número de Personalidad**: Basado en las consonantes del nombre
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+Cada número generado viene con una interpretación detallada que proporciona información sobre diferentes aspectos de la personalidad, destino y potencial del usuario.
 
-## Deployment
+---
 
-Your project is live at:
+## Paso a Paso para su Ejecución
 
-**[https://vercel.com/juanlosada01-8558s-projects/v0-astrology-number-generator](https://vercel.com/juanlosada01-8558s-projects/v0-astrology-number-generator)**
+### Requisitos Previos
 
-## Build your app
+- Node.js (versión 18 o superior)
+- npm o yarn
 
-Continue building your app on:
+### Pasos de Instalación
 
-**[https://v0.dev/chat/projects/VmWcKEMhPwj](https://v0.dev/chat/projects/VmWcKEMhPwj)**
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/tu-usuario/generador-numeros-astrologicos.git
+   cd generador-numeros-astrologicos
+2. **Instalar dependencias**
+   npm install
+   # o
+   yarn install
+3. **Ejecutar en modo desarrollo**
+   npm run dev
+   # o
+   yarn dev
+4.**Acceder a la aplicación**
+   ve a http://localhost:3000
 
-## How It Works
+## Cómo Usar la Aplicación
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+### Ingresar Datos Personales
+Completa el formulario con tu nombre completo y/o fecha de nacimiento.
+
+### Generar Números
+Haz clic en el botón **"Generar"** para calcular tus números astrológicos.
+
+### Ver Resultados
+Revisa los números generados y sus interpretaciones detalladas.
+
+### Guardar o Compartir
+Utiliza las opciones disponibles para guardar o compartir tus resultados.
